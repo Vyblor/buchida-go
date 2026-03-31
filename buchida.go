@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"time"
 )
 
@@ -133,22 +132,16 @@ func parseError(status int, body []byte) error {
 		errBody.Message = http.StatusText(status)
 	}
 
-	apiErr := &Error{
-		StatusCode: status,
-		Message:    errBody.Message,
-		Code:       errBody.Code,
-	}
-
 	switch status {
 	case 401:
-		return &AuthenticationError{Error: *apiErr}
+		return &AuthenticationError{StatusCode: status, Message: errBody.Message}
 	case 404:
-		return &NotFoundError{Error: *apiErr}
+		return &NotFoundError{StatusCode: status, Message: errBody.Message}
 	case 422:
-		return &ValidationError{Error: *apiErr}
+		return &ValidationError{StatusCode: status, Message: errBody.Message}
 	case 429:
-		return &RateLimitError{Error: *apiErr}
+		return &RateLimitError{StatusCode: status, Message: errBody.Message}
 	default:
-		return apiErr
+		return &APIError{StatusCode: status, Message: errBody.Message, Code: errBody.Code}
 	}
 }

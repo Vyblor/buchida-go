@@ -340,7 +340,7 @@ func TestError500(t *testing.T) {
 	client, _ := New("bc_test_xxx", WithBaseURL(server.URL))
 	_, err := client.Emails.List(context.Background(), nil)
 
-	if _, ok := err.(*Error); !ok {
-		t.Fatalf("expected Error, got %T", err)
+	if _, ok := err.(*APIError); !ok {
+		t.Fatalf("expected APIError, got %T", err)
 	}
 }
