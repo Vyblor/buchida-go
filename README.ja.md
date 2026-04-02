@@ -1,6 +1,6 @@
 <div align="center">
   <img src="assets/logo-black.svg" alt="buchida" width="280" />
-  <p><strong>Developer-first email API with CJK support</strong></p>
+  <p><strong>CJKサポートを備えた開発者向けメールAPI</strong></p>
 
   [English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
@@ -9,15 +9,15 @@
 
 ---
 
-The official Go SDK for the [buchida](https://buchida.com) email API.
+[buchida](https://buchida.com)メールAPIの公式Go SDKです。
 
-## Installation
+## インストール
 
 ```bash
 go get github.com/Vyblor/buchida-go
 ```
 
-## Quick Start
+## クイックスタート
 
 ```go
 package main
@@ -39,30 +39,30 @@ func main() {
     resp, err := client.Emails.Send(context.Background(), &buchida.SendEmailParams{
         From:    "hello@yourdomain.com",
         To:      "user@example.com",
-        Subject: "Welcome to buchida!",
-        HTML:    "<h1>Hello!</h1><p>Welcome aboard.</p>",
+        Subject: "buchidaへようこそ！",
+        HTML:    "<h1>こんにちは！</h1><p>ご登録ありがとうございます。</p>",
     })
     if err != nil {
         log.Fatal(err)
     }
 
-    fmt.Printf("Email sent: %s\n", resp.ID)
+    fmt.Printf("メール送信完了: %s\n", resp.ID)
 }
 ```
 
-## Features
+## 特徴
 
-- Idiomatic Go with `context.Context` support
-- Zero dependencies (stdlib `net/http`)
+- `context.Context`サポートによる慣用的なGoコード
+- 依存関係ゼロ（標準ライブラリ`net/http`）
 - Go 1.21+
-- Typed error handling
+- 型付きエラーハンドリング
 
-## Documentation
+## ドキュメント
 
-- [Quick Start](https://buchida.com/docs/quickstart)
-- [API Reference](https://buchida.com/docs/sending-email)
+- [クイックスタート](https://buchida.com/ja/docs/quickstart)
+- [APIリファレンス](https://buchida.com/ja/docs/sending-email)
 - [GitHub](https://github.com/Vyblor/buchida-go)
 
-## License
+## ライセンス
 
 MIT
