@@ -1,67 +1,46 @@
-<div align="center">
-  <img src="assets/logo-black.svg" alt="buchida" width="280" />
-  <p><strong>Developer-first email API with CJK support</strong></p>
+# buchida-go
 
-  [English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md) | [中文](README.zh.md)
+**buchida Go SDK — Email API for AI agents**
 
-  [![Go Reference](https://pkg.go.dev/badge/github.com/Vyblor/buchida-go)](https://pkg.go.dev/github.com/Vyblor/buchida-go) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-</div>
+buchida-go is the official Go SDK for **buchida** — an email API built for AI agents. buchida ships a CLI, an MCP server, and SDKs in 5 languages (Node, Python, Go, Ruby, Java), all sharing the same REST API surface. `@buchida/email` templates render Korean, Japanese, and Chinese natively.
 
----
-
-The official Go SDK for the [buchida](https://buchida.com) email API.
-
-## Installation
+## Install
 
 ```bash
 go get github.com/Vyblor/buchida-go
 ```
 
-## Quick Start
+## Send your first email
 
 ```go
-package main
+import "github.com/Vyblor/buchida-go"
 
-import (
-    "context"
-    "fmt"
-    "log"
+client := buchida.NewClient(os.Getenv("BUCHIDA_API_KEY"))
 
-    buchida "github.com/Vyblor/buchida-go"
-)
-
-func main() {
-    client, err := buchida.New("bc_live_xxxxxxxxxxxxxxxxxxxxx")
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    resp, err := client.Emails.Send(context.Background(), &buchida.SendEmailParams{
-        From:    "hello@yourdomain.com",
-        To:      "user@example.com",
-        Subject: "Welcome to buchida!",
-        HTML:    "<h1>Hello!</h1><p>Welcome aboard.</p>",
-    })
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    fmt.Printf("Email sent: %s\n", resp.ID)
-}
+client.Emails.Send(&buchida.SendEmailRequest{
+    From:    "hello@yourapp.com",
+    To:      []string{"user@example.com"},
+    Subject: "Hello",
+    Html:    "<h1>Welcome</h1>",
+})
 ```
-
-## Features
-
-- Idiomatic Go with `context.Context` support
-- Zero dependencies (stdlib `net/http`)
-- Go 1.21+
-- Typed error handling
 
 ## Documentation
 
-- [Quick Start](https://buchida.com/docs/quickstart)
-- [API Reference](https://buchida.com/docs/sending-email)
-- [GitHub](https://github.com/Vyblor/buchida-go)
+Full docs: **[buchida.com/docs](https://buchida.com/docs)**
+
+- API reference: https://buchida.com/docs/api-reference
+- Quickstart guide: https://buchida.com/docs/quickstart
+- CJK email templates: https://buchida.com/docs/templates
+- MCP server setup: https://buchida.com/docs/mcp
+- CLI reference: https://buchida.com/docs/cli
+
+## Links
+
+- **Website:** [buchida.com](https://buchida.com)
+- **Documentation:** [buchida.com/docs](https://buchida.com/docs)
+- **Pricing:** [buchida.com/pricing](https://buchida.com/pricing)
+- **GitHub:** https://github.com/Vyblor/buchida-go
 
 ## License
 
