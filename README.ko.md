@@ -1,15 +1,15 @@
 <div align="center">
   <img src="assets/logo-black.svg" alt="buchida" width="280" />
-  <p><strong>CJK 지원을 갖춘 개발자 중심 이메일 API</strong></p>
+  <p><strong>buchida Go SDK — AI 에이전트를 위한 이메일 API</strong></p>
 
-  [English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md) | [中文](README.zh.md)
+  [English](README.md) | [**한국어**](README.ko.md) | [日本語](README.ja.md) | [中文](README.zh.md)
 
   [![Go Reference](https://pkg.go.dev/badge/github.com/Vyblor/buchida-go)](https://pkg.go.dev/github.com/Vyblor/buchida-go) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 </div>
 
 ---
 
-[buchida](https://buchida.com) 이메일 API의 공식 Go SDK입니다.
+buchida-go는 AI 에이전트를 위해 만들어진 이메일 API의 공식 Go SDK입니다. buchida는 CLI, MCP 서버, 그리고 5개 언어 SDK (Node, Python, Go, Ruby, Java)를 제공하며, 모두 동일한 REST API 표면을 공유합니다. `@buchida/email` 템플릿은 한국어, 일본어, 중국어를 네이티브로 렌더링합니다.
 
 ## 설치
 
@@ -17,51 +17,37 @@
 go get github.com/Vyblor/buchida-go
 ```
 
-## 빠른 시작
+## 첫 이메일 보내기
 
 ```go
-package main
+import "github.com/Vyblor/buchida-go"
 
-import (
-    "context"
-    "fmt"
-    "log"
+client := buchida.NewClient(os.Getenv("BUCHIDA_API_KEY"))
 
-    buchida "github.com/Vyblor/buchida-go"
-)
-
-func main() {
-    client, err := buchida.New("bc_live_xxxxxxxxxxxxxxxxxxxxx")
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    resp, err := client.Emails.Send(context.Background(), &buchida.SendEmailParams{
-        From:    "hello@yourdomain.com",
-        To:      "user@example.com",
-        Subject: "buchida에 오신 것을 환영합니다!",
-        HTML:    "<h1>안녕하세요!</h1><p>가입을 환영합니다.</p>",
-    })
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    fmt.Printf("이메일 발송 완료: %s\n", resp.ID)
-}
+client.Emails.Send(&buchida.SendEmailRequest{
+    From:    "hello@yourapp.com",
+    To:      []string{"user@example.com"},
+    Subject: "안녕하세요",
+    Html:    "<h1>환영합니다</h1>",
+})
 ```
-
-## 주요 기능
-
-- `context.Context` 지원의 관용적 Go 코드
-- 의존성 없음 (표준 라이브러리 `net/http`)
-- Go 1.21+
-- 타입 기반 에러 처리
 
 ## 문서
 
-- [빠른 시작 가이드](https://buchida.com/ko/docs/quickstart)
-- [API 레퍼런스](https://buchida.com/ko/docs/sending-email)
-- [GitHub](https://github.com/Vyblor/buchida-go)
+전체 문서: **[buchida.com/docs](https://buchida.com/docs)**
+
+- API 레퍼런스: https://buchida.com/docs/api-reference
+- 빠른 시작 가이드: https://buchida.com/docs/quickstart
+- CJK 이메일 템플릿: https://buchida.com/docs/templates
+- MCP 서버 설정: https://buchida.com/docs/mcp
+- CLI 레퍼런스: https://buchida.com/docs/cli
+
+## 링크
+
+- **웹사이트:** [buchida.com](https://buchida.com)
+- **문서:** [buchida.com/docs](https://buchida.com/docs)
+- **요금제:** [buchida.com/pricing](https://buchida.com/pricing)
+- **GitHub:** https://github.com/Vyblor/buchida-go
 
 ## 라이선스
 

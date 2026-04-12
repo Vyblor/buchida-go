@@ -1,15 +1,15 @@
 <div align="center">
   <img src="assets/logo-black.svg" alt="buchida" width="280" />
-  <p><strong>支持CJK的开发者优先邮件API</strong></p>
+  <p><strong>buchida Go SDK — 为 AI 代理打造的邮件 API</strong></p>
 
-  [English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md) | [中文](README.zh.md)
+  [English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md) | [**中文**](README.zh.md)
 
   [![Go Reference](https://pkg.go.dev/badge/github.com/Vyblor/buchida-go)](https://pkg.go.dev/github.com/Vyblor/buchida-go) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 </div>
 
 ---
 
-[buchida](https://buchida.com)邮件API的官方Go SDK。
+buchida-go 是为 AI 代理打造的邮件 API 的官方 Go SDK。buchida 提供 CLI、MCP 服务器和 5 种语言的 SDK (Node、Python、Go、Ruby、Java),所有这些都共享相同的 REST API 表面。`@buchida/email` 模板原生渲染韩语、日语和中文。
 
 ## 安装
 
@@ -17,51 +17,37 @@
 go get github.com/Vyblor/buchida-go
 ```
 
-## 快速开始
+## 发送您的第一封邮件
 
 ```go
-package main
+import "github.com/Vyblor/buchida-go"
 
-import (
-    "context"
-    "fmt"
-    "log"
+client := buchida.NewClient(os.Getenv("BUCHIDA_API_KEY"))
 
-    buchida "github.com/Vyblor/buchida-go"
-)
-
-func main() {
-    client, err := buchida.New("bc_live_xxxxxxxxxxxxxxxxxxxxx")
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    resp, err := client.Emails.Send(context.Background(), &buchida.SendEmailParams{
-        From:    "hello@yourdomain.com",
-        To:      "user@example.com",
-        Subject: "欢迎使用buchida！",
-        HTML:    "<h1>你好！</h1><p>欢迎加入。</p>",
-    })
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    fmt.Printf("邮件发送成功: %s\n", resp.ID)
-}
+client.Emails.Send(&buchida.SendEmailRequest{
+    From:    "hello@yourapp.com",
+    To:      []string{"user@example.com"},
+    Subject: "你好",
+    Html:    "<h1>欢迎</h1>",
+})
 ```
-
-## 特性
-
-- 支持`context.Context`的惯用Go代码
-- 零依赖（标准库`net/http`）
-- Go 1.21+
-- 类型化错误处理
 
 ## 文档
 
-- [快速开始](https://buchida.com/zh/docs/quickstart)
-- [API参考](https://buchida.com/zh/docs/sending-email)
-- [GitHub](https://github.com/Vyblor/buchida-go)
+完整文档: **[buchida.com/docs](https://buchida.com/docs)**
+
+- API 参考: https://buchida.com/docs/api-reference
+- 快速入门指南: https://buchida.com/docs/quickstart
+- CJK 邮件模板: https://buchida.com/docs/templates
+- MCP 服务器设置: https://buchida.com/docs/mcp
+- CLI 参考: https://buchida.com/docs/cli
+
+## 链接
+
+- **网站:** [buchida.com](https://buchida.com)
+- **文档:** [buchida.com/docs](https://buchida.com/docs)
+- **定价:** [buchida.com/pricing](https://buchida.com/pricing)
+- **GitHub:** https://github.com/Vyblor/buchida-go
 
 ## 许可证
 
