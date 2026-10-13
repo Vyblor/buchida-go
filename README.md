@@ -20,17 +20,69 @@ go get github.com/Vyblor/buchida-go
 ## Send your first email
 
 ```go
-import "github.com/Vyblor/buchida-go"
+package main
 
-client := buchida.NewClient(os.Getenv("BUCHIDA_API_KEY"))
+import (
+	"context"
+	"fmt"
+	"log"
+	"os"
 
-client.Emails.Send(&buchida.SendEmailRequest{
-    From:    "hello@yourapp.com",
-    To:      []string{"user@example.com"},
-    Subject: "Hello",
-    Html:    "<h1>Welcome</h1>",
-})
+	buchida "github.com/Vyblor/buchida-go"
+)
+
+func main() {
+	client, err := buchida.New(os.Getenv("BUCHIDA_API_KEY"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	email, err := client.Emails.Send(context.Background(), &buchida.SendEmailParams{
+		From:     "hello@yourapp.com",
+		FromName: "Your App",
+		To:       []string{"user@example.com"},
+		Subject:  "Hello",
+		HTML:     "<h1>Welcome</h1>",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(email.ID, email.Status)
+}
 ```
+
+Lists and batches:
+
+```go
+page, err := client.Emails.List(ctx, &buchida.ListEmailsParams{Limit: 20})
+// page.Data []Email, page.Cursor string, page.HasMore bool
+
+results, err := client.Emails.SendBatch(ctx, []buchida.SendEmailParams{
+	{From: "hello@yourapp.com", To: "a@example.com", Subject: "A", Text: "hi"},
+})
+for _, r := range results {
+	if r.Error != nil {
+		fmt.Println(r.Error.Code, r.Error.Message)
+	} else {
+		fmt.Println(r.Data.ID)
+	}
+}
+```
+
+## Upgrading to 0.2
+
+The API wraps every success response in `{"data": ...}`. Earlier versions decoded the
+envelope straight into the result structs, so most fields (for example `Emails.Send` -> `ID`,
+`Emails.Get`, `Domains.Get`) came back empty, and `Domains.List`, `ApiKeys.List`,
+`Webhooks.List`, `Templates.List` and `Emails.SendBatch` returned a decode error. v0.2 unwraps
+`data` and reads the API's snake_case fields (`created_at`, `from_name`, `reply_to`, `dns_records`, ...).
+
+- `SendEmailResponse` is now an alias of `Email` (it only had `ID` before).
+- `Emails.SendBatch` now returns `[]BatchResult` (`Data *Email` or `Error *BatchError` per item)
+  instead of `[]SendEmailResponse`.
+- `ListEmailsResponse` gained `HasMore`; `Domain.Records` now reads `dns_records`.
+- New: `SendEmailParams.FromName`, `Email.FromName`; request bodies use snake_case
+  (`reply_to`, `scheduled_at`); nested API errors (`{"error": {"code", "message"}}`) are parsed.
 
 ## Documentation
 

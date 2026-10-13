@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://api.buchida.com"
+	defaultBaseURL = "https://api.buchida.com/v1"
 	defaultTimeout = 30 * time.Second
-	userAgent      = "buchida-go/0.1.0"
+	userAgent      = "buchida-go/0.2.0"
 )
 
 // Option configures the Client.
@@ -122,12 +122,46 @@ func (c *Client) do(ctx context.Context, method, path string, body, result inter
 	return nil
 }
 
+// doData performs a request and decodes the "data" member of the {"data": ...} success
+// envelope into result. A body without a "data" member is decoded as-is.
+func (c *Client) doData(ctx context.Context, method, path string, body, result interface{}) error {
+	var raw json.RawMessage
+	if err := c.do(ctx, method, path, body, &raw); err != nil {
+		return err
+	}
+	if len(raw) == 0 || result == nil {
+		return nil
+	}
+	var env map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &env); err == nil {
+		if data, ok := env["data"]; ok {
+			raw = data
+		}
+	}
+	if err := json.Unmarshal(raw, result); err != nil {
+		return fmt.Errorf("buchida: failed to decode response: %w", err)
+	}
+	return nil
+}
+
 func parseError(status int, body []byte) error {
 	var errBody struct {
 		Message string `json:"message"`
 		Code    string `json:"code"`
+		Error   *struct {
+			Message string `json:"message"`
+			Code    string `json:"code"`
+		} `json:"error"`
 	}
 	_ = json.Unmarshal(body, &errBody)
+	if errBody.Error != nil {
+		if errBody.Error.Message != "" {
+			errBody.Message = errBody.Error.Message
+		}
+		if errBody.Error.Code != "" {
+			errBody.Code = errBody.Error.Code
+		}
+	}
 	if errBody.Message == "" {
 		errBody.Message = http.StatusText(status)
 	}

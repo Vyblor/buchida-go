@@ -20,16 +20,35 @@ go get github.com/Vyblor/buchida-go
 ## 첫 이메일 보내기
 
 ```go
-import "github.com/Vyblor/buchida-go"
+package main
 
-client := buchida.NewClient(os.Getenv("BUCHIDA_API_KEY"))
+import (
+	"context"
+	"fmt"
+	"log"
+	"os"
 
-client.Emails.Send(&buchida.SendEmailRequest{
-    From:    "hello@yourapp.com",
-    To:      []string{"user@example.com"},
-    Subject: "안녕하세요",
-    Html:    "<h1>환영합니다</h1>",
-})
+	buchida "github.com/Vyblor/buchida-go"
+)
+
+func main() {
+	client, err := buchida.New(os.Getenv("BUCHIDA_API_KEY"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	email, err := client.Emails.Send(context.Background(), &buchida.SendEmailParams{
+		From:     "hello@yourapp.com",
+		FromName: "Your App",
+		To:       []string{"user@example.com"},
+		Subject:  "안녕하세요",
+		HTML:     "<h1>환영합니다</h1>",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(email.ID, email.Status)
+}
 ```
 
 ## 문서

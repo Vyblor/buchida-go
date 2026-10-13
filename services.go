@@ -13,14 +13,14 @@ type EmailsService struct{ client *Client }
 // Send sends an email.
 func (s *EmailsService) Send(ctx context.Context, params *SendEmailParams) (*SendEmailResponse, error) {
 	var resp SendEmailResponse
-	err := s.client.do(ctx, "POST", "/emails", params, &resp)
+	err := s.client.doData(ctx, "POST", "/emails", params, &resp)
 	return &resp, err
 }
 
 // Get retrieves an email by ID.
 func (s *EmailsService) Get(ctx context.Context, id string) (*Email, error) {
 	var resp Email
-	err := s.client.do(ctx, "GET", fmt.Sprintf("/emails/%s", id), nil, &resp)
+	err := s.client.doData(ctx, "GET", fmt.Sprintf("/emails/%s", id), nil, &resp)
 	return &resp, err
 }
 
@@ -59,10 +59,11 @@ func (s *EmailsService) Cancel(ctx context.Context, id string) error {
 	return s.client.do(ctx, "POST", fmt.Sprintf("/emails/%s/cancel", id), nil, nil)
 }
 
-// SendBatch sends multiple emails at once.
-func (s *EmailsService) SendBatch(ctx context.Context, emails []SendEmailParams) ([]SendEmailResponse, error) {
-	var resp []SendEmailResponse
-	err := s.client.do(ctx, "POST", "/emails/batch", emails, &resp)
+// SendBatch sends multiple emails at once. It returns one BatchResult per input email
+// (in order); each has either Data (the created email) or Error.
+func (s *EmailsService) SendBatch(ctx context.Context, emails []SendEmailParams) ([]BatchResult, error) {
+	var resp []BatchResult
+	err := s.client.doData(ctx, "POST", "/emails/batch", emails, &resp)
 	return resp, err
 }
 
@@ -72,28 +73,28 @@ type DomainsService struct{ client *Client }
 // Create creates a new sending domain.
 func (s *DomainsService) Create(ctx context.Context, params *CreateDomainParams) (*Domain, error) {
 	var resp Domain
-	err := s.client.do(ctx, "POST", "/domains", params, &resp)
+	err := s.client.doData(ctx, "POST", "/domains", params, &resp)
 	return &resp, err
 }
 
 // List lists all domains.
 func (s *DomainsService) List(ctx context.Context) ([]Domain, error) {
 	var resp []Domain
-	err := s.client.do(ctx, "GET", "/domains", nil, &resp)
+	err := s.client.doData(ctx, "GET", "/domains", nil, &resp)
 	return resp, err
 }
 
 // Get retrieves a domain by ID.
 func (s *DomainsService) Get(ctx context.Context, id string) (*Domain, error) {
 	var resp Domain
-	err := s.client.do(ctx, "GET", fmt.Sprintf("/domains/%s", id), nil, &resp)
+	err := s.client.doData(ctx, "GET", fmt.Sprintf("/domains/%s", id), nil, &resp)
 	return &resp, err
 }
 
 // Verify triggers domain verification.
 func (s *DomainsService) Verify(ctx context.Context, id string) (*Domain, error) {
 	var resp Domain
-	err := s.client.do(ctx, "POST", fmt.Sprintf("/domains/%s/verify", id), nil, &resp)
+	err := s.client.doData(ctx, "POST", fmt.Sprintf("/domains/%s/verify", id), nil, &resp)
 	return &resp, err
 }
 
@@ -103,14 +104,14 @@ type ApiKeysService struct{ client *Client }
 // Create creates a new API key.
 func (s *ApiKeysService) Create(ctx context.Context, params *CreateApiKeyParams) (*ApiKey, error) {
 	var resp ApiKey
-	err := s.client.do(ctx, "POST", "/api-keys", params, &resp)
+	err := s.client.doData(ctx, "POST", "/api-keys", params, &resp)
 	return &resp, err
 }
 
 // List lists all API keys.
 func (s *ApiKeysService) List(ctx context.Context) ([]ApiKey, error) {
 	var resp []ApiKey
-	err := s.client.do(ctx, "GET", "/api-keys", nil, &resp)
+	err := s.client.doData(ctx, "GET", "/api-keys", nil, &resp)
 	return resp, err
 }
 
@@ -125,14 +126,14 @@ type WebhooksService struct{ client *Client }
 // Create creates a new webhook.
 func (s *WebhooksService) Create(ctx context.Context, params *CreateWebhookParams) (*Webhook, error) {
 	var resp Webhook
-	err := s.client.do(ctx, "POST", "/webhooks", params, &resp)
+	err := s.client.doData(ctx, "POST", "/webhooks", params, &resp)
 	return &resp, err
 }
 
 // List lists all webhooks.
 func (s *WebhooksService) List(ctx context.Context) ([]Webhook, error) {
 	var resp []Webhook
-	err := s.client.do(ctx, "GET", "/webhooks", nil, &resp)
+	err := s.client.doData(ctx, "GET", "/webhooks", nil, &resp)
 	return resp, err
 }
 
@@ -147,14 +148,14 @@ type TemplatesService struct{ client *Client }
 // List lists all templates.
 func (s *TemplatesService) List(ctx context.Context) ([]Template, error) {
 	var resp []Template
-	err := s.client.do(ctx, "GET", "/templates", nil, &resp)
+	err := s.client.doData(ctx, "GET", "/templates", nil, &resp)
 	return resp, err
 }
 
 // Get retrieves a template by ID.
 func (s *TemplatesService) Get(ctx context.Context, id string) (*Template, error) {
 	var resp Template
-	err := s.client.do(ctx, "GET", fmt.Sprintf("/templates/%s", id), nil, &resp)
+	err := s.client.doData(ctx, "GET", fmt.Sprintf("/templates/%s", id), nil, &resp)
 	return &resp, err
 }
 
@@ -164,13 +165,14 @@ type MetricsService struct{ client *Client }
 // Get retrieves email metrics.
 func (s *MetricsService) Get(ctx context.Context, params *GetMetricsParams) (*Metrics, error) {
 	q := url.Values{}
-	q.Set("from", params.From)
-	q.Set("to", params.To)
+	// The API filters on from_date/to_date; plain from/to were silently ignored.
+	q.Set("from_date", params.From)
+	q.Set("to_date", params.To)
 	if params.Granularity != "" {
 		q.Set("granularity", params.Granularity)
 	}
 
 	var resp Metrics
-	err := s.client.do(ctx, "GET", "/metrics?"+q.Encode(), nil, &resp)
+	err := s.client.doData(ctx, "GET", "/metrics?"+q.Encode(), nil, &resp)
 	return &resp, err
 }
